@@ -29,18 +29,18 @@ int Server::get_max_fd() const{
     return (maxFd);
 }
 
+// filepath: [Utilities.cpp](http://_vscodecontentref_/3)
 std::vector<std::string> Utilities::divideAtFirstSpace(const std::string& input) {
     std::vector<std::string> result;
-    size_t spacePos = input.find(' ');
     std::string temp = input;
-    if (input[input.size()-1] == '\n') {
+    if (!input.empty() && input[input.size()-1] == '\n') {
         temp = input.substr(0, input.size() - 1);
     }
+    size_t spacePos = temp.find(' ');
     if (spacePos != std::string::npos) {
         result.push_back(temp.substr(0, spacePos));
         result.push_back(temp.substr(spacePos + 1));
     } else {
-        // If no space is found, the whole string is the first part, and the second part is empty.
         result.push_back(temp);
         result.push_back("");
     }
@@ -89,13 +89,14 @@ void Utilities::notifyAllClients(std::vector<int> fd, std::string message){
 std::vector<std::string> Utilities::divideStringByNewline(const std::string& str) {
     std::vector<std::string> result;
     std::string::size_type start = 0;
-    std::string::size_type end = str.find('\n');
-
-    while (end != std::string::npos) {
+    std::string::size_type end;
+    while ((end = str.find('\n', start)) != std::string::npos) {
         result.push_back(str.substr(start, end - start));
         start = end + 1;
-        end = str.find('\n', start);
     }
+    // Son satırı da ekle (eğer varsa)
+    if (start < str.length())
+        result.push_back(str.substr(start));
     return result;
 }
 
@@ -148,24 +149,15 @@ void Server::updateClientGuiWithMembersBetter(Client &client, Channel &channel) 
 
 }
 
-std::vector<std::string> Utilities::tokenizeCommand(std::string& cmd){
-
+std::vector<std::string> Utilities::tokenizeCommand(std::string& cmd) {
     std::vector<std::string> result;
-    std::string::size_type start = 0;
-    std::string::size_type end = 0;
-
-    while (end != std::string::npos) {
-        end = cmd.find(' ', start);
-
-        // Add the word to the result vector
-        if (end != std::string::npos) {
-            result.push_back(cmd.substr(start, end - start));
-            start = end + 1;
-        } else {
-            // Add the last word
-            result.push_back(cmd.substr(start));
-        }
+    std::string::size_type start = 0, end;
+    while ((end = cmd.find(' ', start)) != std::string::npos) {
+        result.push_back(cmd.substr(start, end - start));
+        start = end + 1;
     }
+    if (start < cmd.length())
+        result.push_back(cmd.substr(start));
     return result;
 }
 
@@ -213,20 +205,26 @@ void Utilities::listChannelUsers(Channel& channel)
 std::string Utilities::getProjectInfoMessage(void){
     std::string msg;
 
-    msg += "* 42 Ecole IRC Project \n";
-    msg += "* Developers: \n";
-    msg += "* - Eymen Hafsa Albayrak \n";
-    msg += "* - Ezgi Deniz Çakır \n";
-    msg += "* - Sümeyra Yıldız \n";
-    msg += "* \n";
-    msg += "* Project Information: \n";
-    msg += "* - Start Date: 16/07/2024 \n";
-    msg += "* - End Date: ../08/2024 \n";
-    msg += "* Thanks to the following individuals for their contributions: \n";
-    msg += "* - ayalman         Alp Arda Yalman \n";
-    msg += "* - tacikgoz        Talha Açıkgöz \n";
-    msg += "* \n";
-    msg += "* End of /INFO list. \n";
+    msg += "========================================\n";
+    msg += "      🚀 42 Ecole IRC Project 🚀\n";
+    msg += "========================================\n";
+    msg += "  Developed by:\n";
+    msg += "    • Mustafa Buğra Sansar\n";
+    msg += "    • Berat Öntürk\n";
+    msg += "    • Burak Öntürk\n";
+    msg += "----------------------------------------\n";
+    msg += "  Project Information:\n";
+    msg += "    Start Date : 02/04/2025\n";
+    msg += "    End Date   : ../05/2025\n";
+    msg += "----------------------------------------\n";
+    msg += "  Welcome to our custom IRC server!\n";
+    msg += "  Enjoy real-time chat, channels, and\n";
+    msg += "  a true 42 spirit of collaboration.\n";
+    msg += "----------------------------------------\n";
+    msg += "  Thank you for using our project!\n";
+    msg += "========================================\n";
+    msg += "         End of /INFO list\n";
+    msg += "========================================\n";
 
     return msg;
-}   
+}

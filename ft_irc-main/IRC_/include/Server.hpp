@@ -88,6 +88,7 @@ class Server
         void removeClient(ClientIterator &);
         int doesChannelExist(std::string const&);
         int isClientInChannel(Client &c, std::string roomName);//notice
+        Client createClient(int client_fd, const sockaddr_in& clientAddr);
 
         int isUserExist(std::string s);
 
